@@ -1,0 +1,80 @@
+---
+import HeaderLink from './HeaderLink.astro';
+import Logo from './Logo.astro';
+
+const { currentPath } = Astro.props;
+
+function isActive(path) {
+  return currentPath === path;
+}
+---
+
+<header class="bg-white shadow-sm sticky top-0 z-50">
+  <div class="container mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+    <a href="/" class="flex items-center">
+      <Logo class="w-8 h-8 md:w-12 md:h-12 mr-2 md:mr-3" />
+      <span class="text-xl md:text-3xl font-bold text-primary">Neural Diwan</span>
+    </a>
+    
+    <nav class="hidden md:flex space-x-4 items-center">
+      <HeaderLink href="/" class={isActive('/') ? 'text-blue-500' : ''}>Home</HeaderLink>
+      
+      <div class="relative group">
+        <button id="blogDropdownButton" class="flex items-center space-x-1 text-gray-700 hover:text-blue-500 focus:outline-none">
+          <span>Blog</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="blogDropdownMenu" class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
+          <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+            <a href="/blog" class={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${isActive('/blog') ? 'bg-gray-100' : ''}`} role="menuitem">All Posts</a>
+            <a href="/blog/category/gaussiansplatting" class={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${isActive('/blog/category/gaussiansplatting') ? 'bg-gray-100' : ''}`} role="menuitem">GaussianSplatting</a>
+            <a href="/blog/category/computervision" class={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${isActive('/blog/category/computervision') ? 'bg-gray-100' : ''}`} role="menuitem">ComputerVision</a>
+            <a href="/blog/category/robotics" class={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${isActive('/blog/category/robotics') ? 'bg-gray-100' : ''}`} role="menuitem">Robotics</a>
+          </div>
+        </div>
+      </div>
+      
+      <HeaderLink href="/projects" class={isActive('/projects') ? 'text-blue-500' : ''}>Projects</HeaderLink>
+      <HeaderLink href="/about" class={isActive('/about') ? 'text-blue-500' : ''}>About</HeaderLink>
+    </nav>
+    
+    <button id="mobileMenuToggle" class="md:hidden text-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
+  </div>
+</header>
+
+<script>
+  const blogDropdownButton = document.getElementById('blogDropdownButton');
+  const blogDropdownMenu = document.getElementById('blogDropdownMenu');
+
+  blogDropdownButton.addEventListener('click', () => {
+    blogDropdownMenu.classList.toggle('hidden');
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!blogDropdownButton.contains(event.target) && !blogDropdownMenu.contains(event.target)) {
+      blogDropdownMenu.classList.add('hidden');
+    }
+  });
+
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+  const mobileMenu = document.querySelector('nav');
+
+  mobileMenuToggle.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+    mobileMenu.classList.toggle('flex');
+    mobileMenu.classList.toggle('flex-col');
+    mobileMenu.classList.toggle('absolute');
+    mobileMenu.classList.toggle('top-full');
+    mobileMenu.classList.toggle('left-0');
+    mobileMenu.classList.toggle('right-0');
+    mobileMenu.classList.toggle('bg-white');
+    mobileMenu.classList.toggle('shadow-md');
+    mobileMenu.classList.toggle('p-4');
+  });
+</script>

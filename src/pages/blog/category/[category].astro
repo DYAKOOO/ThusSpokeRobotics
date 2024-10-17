@@ -1,0 +1,165 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import BlogPost from '../../../layouts/BlogPost.astro';
+import { getCollection } from 'astro:content';
+
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+  console.log('All posts:', allPosts);
+  const uniqueCategories = [...new Set(allPosts.map(post => post.data.category))];
+  console.log('Unique categories:', uniqueCategories);
+  
+  return uniqueCategories.map(category => {
+    console.log('Processing category:', category);
+    return {
+      params: { category: category.toLowerCase() },
+      props: { category, posts: allPosts.filter(post => post.data.category === category) },
+    };
+  });
+}
+
+const { category, posts } = Astro.props;
+const tags = [...new Set(posts.flatMap(post => post.data.tags))];
+---
+
+<Layout title={`${category} Blog Posts`}>
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">{category}</h1>
+
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-grow relative">
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Search posts..." 
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <div id="search-results" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden"></div>
+        </div>
+        <div class="flex-shrink-0">
+          <select id="tagFilter" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="">All Tags</option>
+            {tags.map(tag => (
+              <option value={tag}>{tag}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div id="active-filters" class="mt-4 flex flex-wrap gap-2"></div>
+      <button id="clear-filters" class="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition duration-300 hidden">Clear Filters</button>
+    </div>
+
+    <div id="posts-count" class="mb-4 text-gray-600"></div>
+
+    {posts.length === 0 ? (
+      <p>No posts found in this category.</p>
+    ) : (
+      <div id="blogPosts" class="grid gap-8 md:grid-cols-2">
+        {posts.map((post) => <BlogPost post={post} />)}
+      </div>
+    )}
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    const tagFilter = document.getElementById('tagFilter');
+    const blogPosts = document.querySelectorAll('.blog-post');
+    const activeFilters = document.getElementById('active-filters');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    const postsCount = document.getElementById('posts-count');
+
+    let currentFilters = {
+      search: '',
+      tag: ''
+    };
+
+    function filterPosts() {
+      let visiblePosts = 0;
+
+      blogPosts.forEach(post => {
+        const title = post.querySelector('h2').textContent.toLowerCase();
+        const tags = post.dataset.tags.split(',');
+
+        const matchesSearch = title.includes(currentFilters.search.toLowerCase());
+        const matchesTag = currentFilters.tag === '' || tags.includes(currentFilters.tag);
+
+        const isVisible = matchesSearch && matchesTag;
+        post.style.display = isVisible ? 'block' : 'none';
+        if (isVisible) visiblePosts++;
+      });
+
+      updateActiveFilters();
+      updatePostsCount(visiblePosts);
+    }
+
+    function updateActiveFilters() {
+      activeFilters.innerHTML = '';
+      clearFiltersBtn.classList.add('hidden');
+
+      if (currentFilters.search) {
+        addFilterPill('search', currentFilters.search);
+      }
+      if (currentFilters.tag) {
+        addFilterPill('tag', currentFilters.tag);
+      }
+
+      if (currentFilters.search || currentFilters.tag) {
+        clearFiltersBtn.classList.remove('hidden');
+      }
+    }
+
+    function addFilterPill(type, value) {
+      const pill = document.createElement('span');
+      pill.className = 'bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm';
+      pill.textContent = `${type}: ${value}`;
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'ml-1 text-blue-800 hover:text-blue-900';
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', () => {
+        currentFilters[type] = '';
+        if (type === 'search') searchInput.value = '';
+        if (type === 'tag') tagFilter.value = '';
+        filterPosts();
+      });
+
+      pill.appendChild(removeBtn);
+      activeFilters.appendChild(pill);
+    }
+
+    function updatePostsCount(count) {
+      postsCount.textContent = `Showing ${count} post${count !== 1 ? 's' : ''}`;
+    }
+
+    searchInput.addEventListener('input', () => {
+      currentFilters.search = searchInput.value;
+      filterPosts();
+    });
+
+    tagFilter.addEventListener('change', () => {
+      currentFilters.tag = tagFilter.value;
+      filterPosts();
+    });
+
+    clearFiltersBtn.addEventListener('click', () => {
+      currentFilters = { search: '', tag: '' };
+      searchInput.value = '';
+      tagFilter.value = '';
+      filterPosts();
+    });
+
+    // Initial filter
+    filterPosts();
+  </script>
+</Layout>
+
+<style>
+  @media (max-width: 768px) {
+    #blogPosts {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

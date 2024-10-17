@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Sample project data (replace with your actual projects)
+const projects = [
+  {
+    title: "Project 1",
+    description: "This is a description of Project 1.",
+    image: "/project1-image.jpg",
+    link: "https://project1.com"
+  },
+  {
+    title: "Project 2",
+    description: "This is a description of Project 2.",
+    image: "/project2-image.jpg",
+    link: "https://project2.com"
+  },
+  // Add more projects as needed
+];
+---
+
+<Layout title="My Projects">
+  <h1 class="text-4xl font-bold mb-8">My Projects</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    {projects.map((project) => (
+      <div class="bg-surface rounded-lg shadow-md overflow-hidden">
+        <img src={project.image} alt={project.title} class="w-full h-48 object-cover" />
+        <div class="p-4">
+          <h2 class="text-2xl font-semibold mb-2">{project.title}</h2>
+          <p class="text-text-secondary mb-4">{project.description}</p>
+          <a href={project.link} target="_blank" rel="noopener noreferrer" class="bg-accent text-surface py-2 px-4 rounded-md hover:bg-opacity-80 transition duration-300">
+            View Project
+          </a>
+        </div>
+      </div>
+    ))}
+  </div>
+</Layout>

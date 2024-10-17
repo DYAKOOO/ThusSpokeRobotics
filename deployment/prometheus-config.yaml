@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server
+data:
+  prometheus.yml: |
+    scrape_configs:
+      - job_name: 'astro-blog'
+        metrics_path: '/metrics'
+        static_configs:
+          - targets: ['astro-blog-service:8080']

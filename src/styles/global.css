@@ -1,0 +1,108 @@
+/* src/styles/global.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-background: #f0f0f0;
+  --color-surface: #ffffff;
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  --color-link: #3b82f6;
+  --color-accent: #f52e0b;
+  --color-border: #d1d5db;
+  --header-height: 4rem;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: 'Inter', sans-serif;
+}
+
+a {
+  color: var(--color-link);
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+.content-section {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background-color: var(--color-surface);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.card {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  background-color: var(--color-surface);
+}
+
+.card:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn {
+  @apply px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-600 transition duration-300 ease-in-out;
+}
+
+.select-wrapper {
+  @apply relative;
+}
+
+.select-wrapper::after {
+  content: '\25BC';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.custom-select {
+  @apply appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight;
+}
+
+.custom-select:focus {
+  @apply outline-none border-blue-500;
+}
+
+@media (max-width: 640px) {
+  .blog-post {
+    @apply w-full;
+  }
+
+  .blog-post .tag-container {
+    @apply flex-wrap;
+  }
+
+  .blog-post .tag {
+    @apply text-xs px-2 py-1 mb-1;
+  }
+}
+
+/* If using Tailwind, you can add these custom utilities to your Tailwind config */
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}

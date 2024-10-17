@@ -1,0 +1,52 @@
+---
+import { type CollectionEntry } from 'astro:content';
+import FormattedDate from '../components/FormattedDate.astro';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { title, pubDate, updatedDate, heroImage, description, category, tags } = post.data;
+---
+
+<article class="blog-post card hover:shadow-lg transition-all duration-300" data-slug={post.slug} data-category={category} data-tags={tags.join(',')}>
+  <a href={`/blog/${post.slug}/`} class="block">
+    {heroImage && (
+      <img 
+        src={heroImage} 
+        alt="" 
+        class="w-full h-48 object-cover rounded-t-lg"
+      />
+    )}
+    <div class="p-4">
+      {category && (
+        <p class="text-sm text-accent font-medium mb-2">{category}</p>
+      )}
+      <h2 class="text-xl font-semibold text-primary mb-2 line-clamp-2">{title}</h2>
+      <FormattedDate date={pubDate} />
+      {updatedDate && (
+        <div class="text-sm text-gray-500 mt-1">
+          Updated: <FormattedDate date={updatedDate} />
+        </div>
+      )}
+      {description && (
+        <p class="text-text-secondary mt-2 text-sm line-clamp-3">{description}</p>
+      )}
+      {tags && tags.length > 0 && (
+        <div class="mt-4 flex flex-wrap gap-2">
+          {tags.slice(0, 3).map((tag) => (
+            <span class="bg-gray-100 text-text-secondary px-2 py-1 rounded-full text-xs whitespace-nowrap">
+              {tag}
+            </span>
+          ))}
+          {tags.length > 3 && (
+            <span class="bg-gray-100 text-text-secondary px-2 py-1 rounded-full text-xs whitespace-nowrap">
+              +{tags.length - 3} more
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  </a>
+</article>

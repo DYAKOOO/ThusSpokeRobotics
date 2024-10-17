@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
+}
+
+const post = Astro.props;
+const { Content } = await post.render();
+
+// Simulated comments (replace with actual data fetching logic)
+const comments = [
+  { author: "User1", date: new Date("2023-01-01"), content: "Great post!" },
+  { author: "User2", date: new Date("2023-01-02"), content: "Very informative, thanks!" }
+];
+---
+
+<Layout title={post.data.title}>
+  <article class="max-w-3xl mx-auto">
+    <h1 class="text-4xl font-bold mb-2">{post.data.title}</h1>
+    <FormattedDate date={post.data.pubDate} />
+    {post.data.heroImage && <img src={post.data.heroImage} alt="" class="w-full h-auto my-8 rounded-lg shadow-md" />}
+    <div class="prose prose-lg max-w-none mt-8">
+      <Content />
+    </div>
+    <div class="mt-8 flex flex-wrap gap-2">
+      {post.data.tags.map((tag) => (
+        <a 
+          href={`/blog?tag=${tag}`}
+          class="bg-gray-200 px-3 py-1 rounded-full text-sm text-gray-700 hover:bg-blue-500 hover:text-white transition duration-300"
+        >
+          {tag}
+        </a>
+      ))}
+    </div>
+    
+    <!-- Comment Section -->
+    <div class="mt-12">
+      <h2 class="text-2xl font-bold mb-4">Comments</h2>
+      {comments.map((comment, index) => (
+        <div key={index} class="bg-gray-100 p-4 rounded-lg mb-4">
+          <p class="font-bold">{comment.author}</p>
+          <p class="text-sm text-gray-500"><FormattedDate date={comment.date} /></p>
+          <p class="mt-2">{comment.content}</p>
+        </div>
+      ))}
+      
+      <!-- Comment Form -->
+      <form class="mt-8">
+        <h3 class="text-xl font-bold mb-2">Add a Comment</h3>
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+          <input type="text" id="name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+          <label for="comment" class="block text-sm font-medium text-gray-700">Comment</label>
+          <textarea id="comment" name="comment" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"></textarea>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Submit Comment</button>
+      </form>
+    </div>
+  </article>
+</Layout>

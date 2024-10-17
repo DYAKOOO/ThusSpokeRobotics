@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const allPosts = await getCollection('blog');
+const posts = allPosts.filter(post => post.data.category === 'Gaussian Splatting');
+---
+
+<Layout title="Gaussian Splatting Blog Posts">
+  <h1 class="text-4xl font-bold mb-8">Gaussian Splatting</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {posts.map((post) => <BlogPost post={post} />)}
+  </div>
+</Layout>

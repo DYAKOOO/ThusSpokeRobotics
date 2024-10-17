@@ -1,0 +1,11 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: astro-blog-monitor
+  namespace: prometheus-system
+spec:
+  selector:
+    matchLabels:
+      app: astro-blog
+  endpoints:
+  - port: metrics

@@ -1,0 +1,16 @@
+---
+// src/components/Comment.astro
+export interface Props {
+  author: string;
+  date: Date;
+  content: string;
+}
+
+const { author, date, content } = Astro.props;
+---
+
+<div class="bg-gray-100 p-4 rounded-lg mb-4">
+  <p class="font-bold">{author}</p>
+  <p class="text-sm text-gray-500">{new Date(date).toLocaleString()}</p>
+  <p class="mt-2">{content}</p>
+</div>
