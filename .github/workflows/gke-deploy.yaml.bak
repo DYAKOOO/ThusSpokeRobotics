@@ -1,0 +1,47 @@
+name: Build and Push
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  PROJECT_ID: neural-diwan-435305
+  GKE_CLUSTER: astro-blog-cluster
+  GKE_ZONE: us-central1-a
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
+
+    - name: 'Use gcloud CLI'
+      run: |
+        gcloud info
+        gcloud auth configure-docker gcr.io --quiet
+
+    - name: Install GKE Auth Plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
+        echo "export USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
+
+    - name: Build Docker image
+      run: docker build . -t gcr.io/${{ env.PROJECT_ID }}/astro-blog:${{ github.sha }}
+
+    - name: Push Docker image
+      run: docker push gcr.io/${{ env.PROJECT_ID }}/astro-blog:${{ github.sha }}
+
+    - name: Get GKE credentials
+      run: gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
+
+    - name: Deploy to GKE
+      run: kubectl set image deployment/astro-blog astro-blog=gcr.io/${{ env.PROJECT_ID }}/astro-blog:${{ github.sha }}

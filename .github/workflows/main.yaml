@@ -1,47 +1,71 @@
-name: Build and Push
+name: Deploy to Cloud Run
 
 on:
   push:
     branches: [ main ]
 
 env:
-  PROJECT_ID: neural-diwan-435305
-  GKE_CLUSTER: astro-blog-cluster
-  GKE_ZONE: us-central1-a
+  PROJECT_ID: thusspokerobotics
+  SERVICE_NAME: astro-blog
+  REGION: us-central1
 
 jobs:
-  build-and-push:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v1'
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
       with:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v1'
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
 
-    - name: 'Use gcloud CLI'
+    - name: Configure Docker for GCR
       run: |
         gcloud info
         gcloud auth configure-docker gcr.io --quiet
 
-    - name: Install GKE Auth Plugin
-      run: |
-        gcloud components install gke-gcloud-auth-plugin
-        echo "export USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> $GITHUB_ENV
-
     - name: Build Docker image
-      run: docker build . -t gcr.io/${{ env.PROJECT_ID }}/astro-blog:${{ github.sha }}
+      run: |
+        docker build . \
+          -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+          -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
 
-    - name: Push Docker image
-      run: docker push gcr.io/${{ env.PROJECT_ID }}/astro-blog:${{ github.sha }}
+    - name: Push Docker image to GCR
+      run: |
+        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
 
-    - name: Get GKE credentials
-      run: gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy ${{ env.SERVICE_NAME }} \
+          --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+          --platform managed \
+          --region ${{ env.REGION }} \
+          --project ${{ env.PROJECT_ID }} \
+          --allow-unauthenticated \
+          --memory 512Mi \
+          --cpu 1 \
+          --min-instances 0 \
+          --max-instances 10 \
+          --port 3000
 
-    - name: Deploy to GKE
-      run: kubectl set image deployment/astro-blog astro-blog=gcr.io/${{ env.PROJECT_ID }}/astro-blog:${{ github.sha }}
+    - name: Get service URL
+      id: service-url
+      run: |
+        SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+          --platform managed \
+          --region ${{ env.REGION }} \
+          --project ${{ env.PROJECT_ID }} \
+          --format 'value(status.url)')
+        echo "url=$SERVICE_URL" >> $GITHUB_OUTPUT
+        echo "🚀 Deployed to: $SERVICE_URL"
+
+    - name: Test deployment
+      run: |
+        curl -f ${{ steps.service-url.outputs.url }} || exit 1
+        echo "✅ Deployment test successful!"

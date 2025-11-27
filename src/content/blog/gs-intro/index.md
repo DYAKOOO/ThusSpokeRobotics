@@ -17,6 +17,8 @@ The field of computer graphics has seen a significant leap forward with the intr
 
 The core idea of 3D Gaussian Splatting is to represent scenes using a collection of 3D Gaussians. Each Gaussian encapsulates information about a small portion of the scene:
 
+![3D Gaussian Splatting Example](./images/example.jpg)
+
 ```python
 class GaussianModel:
     def __init__(self, sh_degree):
@@ -29,6 +31,8 @@ class GaussianModel:
 ```
 
 **## Key Advantages of the Technique**
+
+![Rendering Pipeline Diagram](./images/diagram.jpg)
 
 3D Gaussian Splatting offers several notable benefits:
 

@@ -1,6 +1,6 @@
-# Neural Diwan
+# ThusSpokeRobotics
 
-This project is a sophisticated blog built with Astro, featuring a custom design and several advanced functionalities focused on Machine Learning, Gaussian Splatting, and related topics.
+This project is a sophisticated blog built with Astro, featuring a custom design and several advanced functionalities focused on Robotics, Computer Vision, and AI systems.
 
 ## Disclaimer
 
@@ -36,11 +36,11 @@ To get this project up and running on your local machine, follow these steps:
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/neural-diwan.git
+   git clone https://github.com/yourusername/ThusSpokeRobotics.git
    ```
 2. Navigate to the project directory:
    ```
-   cd neural-diwan
+   cd ThusSpokeRobotics
    ```
 3. Install the dependencies:
    ```
@@ -55,7 +55,7 @@ To get this project up and running on your local machine, follow these steps:
 ## Project Structure
 
 ```
-neural-diwan/
+ThusSpokeRobotics/
 │
 ├── public/
 │   └── (static assets like images and sitemap.xml)

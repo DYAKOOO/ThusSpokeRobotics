@@ -11,7 +11,7 @@ import { EventEmitter } from 'events';
 //EventEmitter.defaultMaxListeners = 15;  // or any number higher than 10
 
 export default defineConfig({
-  site: 'https://neuraldiwan.xyz',
+  site: 'https://thusspokerobotics.xyz',
   integrations: [mdx(), sitemap(), tailwind()],
   output: 'static',
   build: {
