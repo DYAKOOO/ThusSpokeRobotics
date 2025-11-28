@@ -2,7 +2,7 @@
 title: '[paper-review] 3D Gaussian Splatting for Real-Time Radiance Field Rendering '
 description: 'Explore how 3D Gaussian Splatting is changing the landscape of computer graphics and real-time rendering'
 pubDate: 2024-09-15
-heroImage: './images/cover.png'
+heroImage: '/images/blog/gs-intro-cover.png'
 category: 'GaussianSplatting'
 tags: ['computer graphics', '3D rendering', 'gaussian splatting', 'novel view synthesis', 'real-time rendering', 'neural radiance fields']
 ---
